@@ -47,15 +47,20 @@ class DashboardController extends Controller
             'lokasi' => 'required|string|max:255',
             'keterangan' => 'required|string',
             'isi_laporan' => 'required|string',
-            'foto' => 'nullable|string|max:255',
+            'foto' => 'nullable|file|mimes:jpeg,png,gif,jpg|max:5120',
         ]);
+
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('pengaduan', 'public');
+        }
 
         Pengaduan::create([
             'id_user' => $user->id,
             'lokasi' => $validated['lokasi'],
             'keterangan' => $validated['keterangan'],
             'isi_laporan' => $validated['isi_laporan'],
-            'foto' => $validated['foto'] ?? null,
+            'foto' => $fotoPath,
             'tanggal_lapor' => now(),
             'status' => 'pending',
         ]);

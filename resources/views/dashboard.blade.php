@@ -109,7 +109,7 @@
                             <h3 class="text-xl font-semibold text-slate-900">Buat Laporan Baru</h3>
                             <p class="mt-3 text-slate-600">Isi informasi pengaduanmu secara jelas agar admin dapat menindaklanjuti dengan cepat.</p>
 
-                            <form class="mt-6 space-y-6" method="POST" action="{{ route('pengaduan.store') }}">
+                            <form class="mt-6 space-y-6" method="POST" action="{{ route('pengaduan.store') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">Lokasi</label>
@@ -128,8 +128,9 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">Foto (opsional)</label>
-                                    <input type="text" name="foto" value="{{ old('foto') }}" placeholder="URL atau nama file" class="mt-2 w-full rounded-3xl border border-blue-200 bg-blue-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:outline-none">
+                                    <input type="file" name="foto" accept="image/*" class="mt-2 w-full rounded-3xl border border-blue-200 bg-blue-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:outline-none">
                                     @error('foto')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                                    <p class="mt-2 text-xs text-slate-500">Format: JPG, PNG, GIF (Maks: 5MB)</p>
                                 </div>
                                 <button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">Kirim Laporan</button>
                             </form>
@@ -150,6 +151,7 @@
                                         <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Tanggal</th>
                                         @if($user->role === 'admin')
+                                            <th class="px-4 py-3">Foto</th>
                                             <th class="px-4 py-3">Feedback</th>
                                         @endif
                                         <th class="px-4 py-3">Aksi</th>
@@ -182,6 +184,13 @@
                                             </td>
                                             <td class="px-4 py-4 text-slate-600">{{ $item->tanggal_lapor->format('d M Y') }}</td>
                                             @if($user->role === 'admin')
+                                                <td class="px-4 py-4">
+                                                    @if($item->foto)
+                                                        <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Laporan" class="h-12 w-12 rounded object-cover border border-blue-200" title="Lihat detail">
+                                                    @else
+                                                        <span class="text-xs text-slate-400">Tidak ada foto</span>
+                                                    @endif
+                                                </td>
                                                 <td class="px-4 py-4">
                                                     <form method="POST" action="{{ route('pengaduan.feedback', $item) }}" class="flex gap-2">
                                                         @csrf
@@ -228,7 +237,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="{{ $user->role === 'admin' ? '7' : '6' }}" class="px-4 py-6 text-center text-slate-500">Belum ada laporan untuk ditampilkan.</td>
+                                            <td colspan="{{ $user->role === 'admin' ? '8' : '6' }}" class="px-4 py-6 text-center text-slate-500">Belum ada laporan untuk ditampilkan.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
