@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengaduan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,6 +11,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        /** @var User $user */
         $user = Auth::user();
 
         if ($user->role === 'admin') {
@@ -46,9 +48,21 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'lokasi' => 'required|string|max:255',
             'keterangan' => 'required|string',
-            'isi_laporan' => 'required|string',
             'foto' => 'nullable|file|mimes:jpeg,png,gif,jpg|max:5120',
         ]);
+
+        $lokasi = $validated['lokasi'];
+
+        $recentDuplicate = Pengaduan::where('id_user', $user->id)
+            ->where('lokasi', $lokasi)
+            ->where('keterangan', $validated['keterangan'])
+            ->where('status', 'pending')
+            ->where('created_at', '>=', now()->subSeconds(5))
+            ->exists();
+
+        if ($recentDuplicate) {
+            return redirect()->back()->with('error', 'Laporan sudah dikirim. Jangan klik dua kali.')->withInput();
+        }
 
         $fotoPath = null;
         if ($request->hasFile('foto')) {
@@ -57,9 +71,9 @@ class DashboardController extends Controller
 
         Pengaduan::create([
             'id_user' => $user->id,
-            'lokasi' => $validated['lokasi'],
+            'lokasi' => $lokasi,
             'keterangan' => $validated['keterangan'],
-            'isi_laporan' => $validated['isi_laporan'],
+            'isi_laporan' => '',
             'foto' => $fotoPath,
             'tanggal_lapor' => now(),
             'status' => 'pending',

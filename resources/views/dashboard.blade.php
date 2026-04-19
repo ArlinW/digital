@@ -109,11 +109,11 @@
                             <h3 class="text-xl font-semibold text-slate-900">Buat Laporan Baru</h3>
                             <p class="mt-3 text-slate-600">Isi informasi pengaduanmu secara jelas agar admin dapat menindaklanjuti dengan cepat.</p>
 
-                            <form class="mt-6 space-y-6" method="POST" action="{{ route('pengaduan.store') }}" enctype="multipart/form-data">
+                            <form id="pengaduan-form" class="mt-6 space-y-6" method="POST" action="{{ route('pengaduan.store') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">Lokasi</label>
-                                    <input type="text" name="lokasi" value="{{ old('lokasi') }}" class="mt-2 w-full rounded-3xl border border-blue-200 bg-blue-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:outline-none" required>
+                                    <input type="text" name="lokasi" value="{{ old('lokasi') }}" class="mt-2 w-full rounded-3xl border border-blue-200 bg-blue-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:outline-none" placeholder="Contoh: Kantin, Ruang Kelas A1, Lapangan Basket" required>
                                     @error('lokasi')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
@@ -122,17 +122,12 @@
                                     @error('keterangan')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700">Detail Laporan</label>
-                                    <textarea name="isi_laporan" rows="4" class="mt-2 w-full rounded-3xl border border-blue-200 bg-blue-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:outline-none" required>{{ old('isi_laporan') }}</textarea>
-                                    @error('isi_laporan')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
-                                </div>
-                                <div>
                                     <label class="block text-sm font-medium text-slate-700">Foto (opsional)</label>
                                     <input type="file" name="foto" accept="image/*" class="mt-2 w-full rounded-3xl border border-blue-200 bg-blue-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:outline-none">
                                     @error('foto')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                                     <p class="mt-2 text-xs text-slate-500">Format: JPG, PNG, GIF (Maks: 5MB)</p>
                                 </div>
-                                <button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">Kirim Laporan</button>
+                                <button id="submit-button" type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">Kirim Laporan</button>
                             </form>
                         </div>
                     @endif
@@ -288,5 +283,25 @@
             </main>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('pengaduan-form');
+
+            if (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.dataset.submitted === 'true') {
+                        event.preventDefault();
+                        return;
+                    }
+                    form.dataset.submitted = 'true';
+                    const button = form.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.disabled = true;
+                        button.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

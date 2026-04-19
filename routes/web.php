@@ -12,10 +12,11 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
+
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/pengaduan', [DashboardController::class, 'storePengaduan'])->name('pengaduan.store');
-    Route::patch('/pengaduan/{pengaduan}/status', [DashboardController::class, 'updateStatus'])->name('pengaduan.status');
     Route::patch('/pengaduan/{pengaduan}/feedback', [DashboardController::class, 'updateFeedback'])->name('pengaduan.feedback');
+    Route::patch('/pengaduan/{pengaduan}/status', [DashboardController::class, 'updateStatus'])->name('pengaduan.status');
     Route::delete('/pengaduan/{pengaduan}', [DashboardController::class, 'destroy'])->name('pengaduan.destroy');
 });
